@@ -54,7 +54,6 @@ public class HelloWorld {
                 MessageConsumer messageConsumer = session.createConsumer(outQueue);
 
                 TextMessage message = session.createTextMessage("Hello world!");
-                message.setLongProperty("ConsumerDelay", 0L);
                 messageProducer.send(message, DeliveryMode.NON_PERSISTENT, Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
                 TextMessage receivedMessage = (TextMessage) messageConsumer.receive(20000000L);
                 if (receivedMessage != null) {

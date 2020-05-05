@@ -53,6 +53,7 @@ import org.jboss.logging.Logger;
 @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public class RemoteQueueMDB implements MessageListener {
 
+    private static final String MESSAGE_CONSUMER_DELAY = "ConsumerDelay";
     private final static Logger LOG = Logger.getLogger(RemoteQueueMDB.class);
     private static final AtomicInteger mdbCnt = new AtomicInteger(0);
     private int msgCnt = 0;
@@ -65,18 +66,11 @@ public class RemoteQueueMDB implements MessageListener {
     @Resource(lookup = "${qpid.cf}")
     private QueueConnectionFactory qcf;
 
-    private final String outQueueName = "outQueue";
-
     public RemoteQueueMDB() {
-
         String className = this.getClass().getName();
-
         if (className.equals("org.acme.jms.mdb.remote.RemoteQueueMDB")) {
-
             mdbID = mdbCnt.getAndIncrement();
-
         }
-
         LOG.infof("MDB[%d] MDB class %s created", mdbID, className);
 
     }
@@ -89,23 +83,12 @@ public class RemoteQueueMDB implements MessageListener {
         try (QueueConnection queueConnection = qcf.createQueueConnection("guest", "guest");
                 QueueSession queueSession = queueConnection.createQueueSession(true, Session.SESSION_TRANSACTED);
                 QueueSender queueSender = queueSession.createSender(outQueue)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debugf("MDB[%d] Message unique value = %s", mdbID, message.getStringProperty(JMSMessageProperties.UNIQUE_VALUE));
-            }
             if (message instanceof TextMessage) {
                 txtMsg = (TextMessage) message;
                 if (LOG.isDebugEnabled()) {
                     LOG.debugf("MDB[%d] Received Message[%s]: with text '%s'.", mdbID, txtMsg.toString(), txtMsg.getText());
                 }
                 msgCnt++;
-                long delay = txtMsg.getLongProperty(JMSMessageProperties.MESSAGE_CONSUMER_DELAY);
-                if (delay != 0) {
-                    Thread.sleep(5000);
-                }
-                boolean throwException = txtMsg.getBooleanProperty(JMSMessageProperties.MESSAGE_THROW_EXCEPTION);
-                if (throwException) {
-                    throw new RuntimeException("This is a dummy exception.");
-                }
                 queueSender.send(message);
                 msgCnt++;
                 queueSession.commit();
@@ -115,9 +98,6 @@ public class RemoteQueueMDB implements MessageListener {
         } catch (JMSException jmsException) {
             LOG.errorf(jmsException, "MDB[%d] Got error while excuting onMessage() method.", mdbID);
             throw new RuntimeException(jmsException);
-        } catch (InterruptedException interruptedException) {
-            LOG.errorf(interruptedException, "MDB[%d] Caught InterruptedException while in sleep.", mdbID);
-            throw new RuntimeException(interruptedException);
         }
         if (LOG.isDebugEnabled()) {
             LOG.debugf("MDB[%d] JMS resources closed.", mdbID);

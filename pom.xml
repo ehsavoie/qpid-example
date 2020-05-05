@@ -34,12 +34,36 @@
         <module>ejb</module>
     </modules>
 
-    <properties>
+    <repositories>
+        <repository>
+            <id>jboss-community-repository</id>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jboss-community-plugin-repository</id>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 
+    <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <version.wildfly.plugin>1.0.2.Final</version.wildfly.plugin>
-        <version.org.jboss.spec.jboss.javaee.7.0>1.1.0.Final-redhat-4</version.org.jboss.spec.jboss.javaee.7.0>
+        <version.org.jboss.spec.jboss.javaee.7.0>1.1.0.Final</version.org.jboss.spec.jboss.javaee.7.0>
         <version.org.jboss.logging>3.3.1.Final</version.org.jboss.logging>
 
         <!-- other plugin versions -->
@@ -52,7 +76,6 @@
         <!-- maven-compiler-plugin -->
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
-
     </properties>
 
     <dependencyManagement>
@@ -69,7 +92,7 @@
             <dependency>
                 <groupId>org.jboss.spec.javax.enterprise.concurrent</groupId>
                 <artifactId>jboss-concurrency-api_1.0_spec</artifactId>
-                <version>1.0.0.Final-redhat-1</version>
+                <version>1.0.0.Final</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
